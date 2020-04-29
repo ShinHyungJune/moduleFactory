@@ -72828,6 +72828,7 @@ var Module = function Module(_ref) {
       setPop = _ref.setPop;
 
   var show = function show() {
+    console.log(module);
     setWillChangeModule(module);
     setPop("모듈 자세히보기");
   };

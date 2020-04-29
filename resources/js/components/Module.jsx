@@ -5,6 +5,7 @@ import {setPop} from "../actions/commonActions";
 const Module = ({module, setWillChangeModule, setPop}) => {
     
     const show = () => {
+        console.log(module);
         setWillChangeModule(module);
         
         setPop("모듈 자세히보기");
