@@ -5,7 +5,6 @@ import {setPop} from "../actions/commonActions";
 const Module = ({module, setWillChangeModule, setPop}) => {
     
     const show = () => {
-        console.log(module);
         setWillChangeModule(module);
         
         setPop("모듈 자세히보기");
@@ -15,7 +14,7 @@ const Module = ({module, setWillChangeModule, setPop}) => {
         <div className="module" onClick={show}>
             <div className="wrap-box-ratio">
                 <div className="box-ratio">
-                    <img src={module.img} alt=""/>
+                    <img src={module.img.url} alt=""/>
                 </div>
             </div>
         

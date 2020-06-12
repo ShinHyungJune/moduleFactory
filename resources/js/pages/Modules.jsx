@@ -3,7 +3,9 @@ import {getModules} from "../actions/moduleActions";
 import {connect} from "react-redux";
 import Module from '../components/Module';
 import CreateModule from '../components/CreateModule';
+import EditModule from '../components/EditModule';
 import {setPop} from "../actions/commonActions";
+import {setModules} from "../actions/moduleActions";
 
 const Modules = ({getModules, modules, scrollActive, setPop}) => {
     let params = {};
@@ -14,16 +16,62 @@ const Modules = ({getModules, modules, scrollActive, setPop}) => {
             getModules(params);
     }, []);
     
+    const create = () => {
+        setPop("모듈 생성");
+    };
+    
+    const save = (response) => {
+        modules.data.unshift(response);
+        
+        store.dispatch(setModules({
+            ...modules,
+            data: modules.data
+        }));
+        
+        setPop(null);
+    };
+    
+    const update = (response) => {
+        setPop(null);
+        
+        store.dispatch(setModules({
+            ...modules,
+            data: modules.data.map(moduleData => {
+                if(moduleData.id === response.data.id)
+                    return response.data;
+                
+                return moduleData;
+            })
+        }));
+    };
+    
+    const remove = () => {
+        axios.delete("/api/vrs/" + vr.id)
+            .then(response => {
+                
+                store.dispatch(setFlash(response.data.message));
+                
+                setVrs({
+                    ...vrs,
+                    data: vrs.data.filter(vrData => vrData.id !== vr.id)
+                });
+                
+                history.push("/");
+            })
+    };
+    
     return (
         <Fragment>
-            <CreateModule willChangeModule={willChangeModule}/>
+            <CreateModule onThen={save}/>
+            
+            <EditModule module={willChangeModule} onThen={update}/>
             
             <div className={`header-utils ${scrollActive ? "active" : ""}`}>
                 <button className="header-util btn bg-sub" title="파일 다운">
                     <img src="/img/icon_down_white.png" alt=""/>
                 </button>
     
-                <button className="header-util btn bg-accent" title="모듈 생성" onClick={() => setPop("모듈 자세히보기")}>
+                <button className="header-util btn bg-accent" title="모듈 생성" onClick={create}>
                     <img src="/img/icon_plus_white.png" alt=""/>
                 </button>
             </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ModuleCollection;
+use App\Http\Resources\ModuleResource;
 use App\Module;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -39,15 +40,23 @@ class ModuleController extends ApiController
             return $module;
         });
 
-        return $this->respond($module);
+        return $this->respond(ModuleResource::make($module));
     }
 
     public function update(Request $request, $id)
     {
         $this->validator($request);
 
-        $module = DB::transaction(function() use($request) {
-            $module = auth()->user()->modules()->update([
+        $module = Module::find($id);
+
+        if(!$module)
+            return $this->respondNotFound();
+
+        if($module->user->id != auth()->id())
+            return $this->respondForbidden();
+
+        $module = DB::transaction(function() use($request, $module) {
+            $module->update([
                 "title" => $request->title,
                 "body" => $request->body,
                 "html" => $request->html,
@@ -55,14 +64,16 @@ class ModuleController extends ApiController
                 "js" => $request->js
             ]);
 
-            $module->tags()->sync($request->tags);
+            if($request->tags)
+                $module->tags()->sync($request->tags);
 
-            $module->addMedia($request->img)->toMediaCollection("images", "s3");
+            if($request->img)
+               $module->addMedia($request->img)->toMediaCollection("images", "s3");
 
             return $module;
         });
 
-        return $this->respondUpdated($module);
+        return $this->respondUpdated(ModuleResource::make($module));
     }
 
     public function delete(Request $request, $id)

@@ -10,7 +10,15 @@ export const getModules = (params = {}) => {
                     payload: response.data
                 });
             });
-   
+    }
+};
+
+export const setModules = (data) => {
+    return (dispatch) => {
+        dispatch({
+            type: SET_MODULES,
+            payload: data
+        });
     }
 };
 

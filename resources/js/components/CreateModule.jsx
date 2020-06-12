@@ -1,32 +1,26 @@
 import React, {useState, useEffect} from 'react';
 import NewForm from './common/NewForm';
 import Pop from './common/Pop';
+import {setPop} from "../actions/commonActions";
 
-const CreateModule = ({willChangeModule}) => {
-    let [defaultForm, setDefaultForm] = useState({});
-    
-    useEffect(() => {
-        if(willChangeModule)
-            setDefaultForm(willChangeModule);
-            
-    }, [willChangeModule]);
+const CreateModule = ({onThen}) => {
     
     return (
         <div className="create-module">
-            <Pop name="모듈 자세히보기" buttons={[]}>
-                <NewForm method="post" url="/api/modules" defaultForm={defaultForm}>
+            <Pop name="모듈 생성" buttons={[]}>
+                <NewForm method={"post"} url={"/api/modules"} onThen={onThen} enterSubmitDisabled={true}>
                     <input type="text" title="제목" name="title"/>
         
                     <textarea title="내용" name="body">
                     </textarea>
         
-                    <input type="file" title="대표 이미지" name="img"/>
-        
-                    <input type="checkbox" name="태그" title="태그"/>
-        
-                    <input type="codeEditor" title="코드"/>
+                    <input type="img" title="대표 이미지" name="img" accept={"image/*"}/>
     
-                    <button type="submit" className="pop-btn">제출</button>
+                    <input type="tags" name="태그" title="태그"/>
+    
+                    <input type="codeEditor" title="코드"/>
+                    
+                    <button type="submit" className="pop-btn">생성</button>
                 </NewForm>
             </Pop>
         </div>

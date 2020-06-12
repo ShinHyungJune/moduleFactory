@@ -4,7 +4,7 @@ const InputFile = ({form, setForm, el, mergeOnChange}) => {
     
     const changeForm = (event) => {
         let file = event.target.files[0];
-    
+        
         // 이미지 파일이라면 썸네일 url 붙여주기
         if(file.type && file.type.includes("image"))
             file.thumbnail = URL.createObjectURL(file);

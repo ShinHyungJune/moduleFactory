@@ -25,10 +25,12 @@ class Module extends Model implements HasMedia
     public function getImgAttribute()
     {
         if($this->hasMedia('images')) {
-            // $url = $this->getMedia('images')[0]->getFullUrl();
-            $url = $this->getMedia('images')[0];
+            $media = $this->getMedia('images')[0];
 
-            return $url;
+            return [
+                "name" => $media->file_name,
+                "url" => $media->getFullUrl()
+            ];
         }
 
         return null;
@@ -37,5 +39,10 @@ class Module extends Model implements HasMedia
     public function tags()
     {
         return $this->belongsToMany(Tag::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
