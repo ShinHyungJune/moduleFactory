@@ -119,7 +119,7 @@ const Form = ({children, url = "", method = "", onThen = (response) => {}, onCat
                             
                                 {React.createElement('p', {className: "input-error"}, form.errors[el.props.name])}
                             </div>
-                        ) : (el)
+                        ) : el.props.type === "submit" ? React.cloneElement(el, {onClick: submit}) : (el)
                 })
             }
         </div>)

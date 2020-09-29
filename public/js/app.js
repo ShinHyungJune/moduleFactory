@@ -73434,7 +73434,9 @@ var Form = function Form(_ref) {
       el: el
     }) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement('p', {
       className: "input-error"
-    }, form.errors[el.props.name])) : el;
+    }, form.errors[el.props.name])) : el.props.type === "submit" ? react__WEBPACK_IMPORTED_MODULE_0___default.a.cloneElement(el, {
+      onClick: submit
+    }) : el;
   })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
     onSubmit: submit,
     onKeyDown: clearError
