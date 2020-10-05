@@ -171,9 +171,9 @@ const Register = ({user, setFlash, history, login}) => {
                             <p className="input-error">{form.errors && form.errors.phone ? form.errors.phone : ""}</p>
                         </div>
                         
-                        <button className="btn-middle btn-full bg-accent">
+                        <button className="btn type02 width-100">
                             {loading
-                                ? <p className="animated flash infinite">전송중</p>
+                                ? <p className="animated flash infinite white">전송중</p>
                                 : "인증문자 보내기"
                             }
                         </button>
@@ -197,7 +197,7 @@ const Register = ({user, setFlash, history, login}) => {
                             </div>
                         </div>
                         
-                        <button className="btn-middle btn-full bg-accent">
+                        <button className="btn type02 width-100">
                             {loading
                                 ? <p className="animated flash infinite">인증중</p>
                                 : "인증하기"
@@ -214,6 +214,14 @@ const Register = ({user, setFlash, history, login}) => {
                                        value={form.phone} disabled/>
                                 
                                 <p className="input-error">{form.errors && form.errors.phone ? form.errors.phone : ""}</p>
+                            </div>
+                        </div>
+    
+                        <div className="input-wrap">
+                            <div className="input-text">
+                                <input type="text" name="name" placeholder="이름" onChange={changeForm}/>
+            
+                                <p className="input-error">{form.errors && form.errors.name ? form.errors.name : ""}</p>
                             </div>
                         </div>
                         
@@ -235,15 +243,7 @@ const Register = ({user, setFlash, history, login}) => {
                             </div>
                         </div>
                         
-                        <div className="input-wrap">
-                            <div className="input-text">
-                                <input type="text" name="name" placeholder="닉네임" onChange={changeForm}/>
-                                
-                                <p className="input-error">{form.errors && form.errors.name ? form.errors.name : ""}</p>
-                            </div>
-                        </div>
-                        
-                        <button className="btn-middle btn-full bg-accent">
+                        <button className="btn type02 width-100">
                             {loading
                                 ? <p className="animated flash infinite">진행중</p>
                                 : "회원가입"

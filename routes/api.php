@@ -33,6 +33,7 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(["middleware" => "auth:sanctum"], function() {
     Route::resource('/modules', 'Api\ModuleController');
+    Route::resource('/projects', 'Api\ProjectController');
 });
 
 Route::post('/passwordReset/send', 'Api\PasswordResetController@sendMail');

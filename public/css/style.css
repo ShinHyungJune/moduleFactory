@@ -1,28 +1,15 @@
-#app {}
-input:disabled {background-color:rgba(254,192,0,0.5); color:#fff !important; border:none;}
-select:disabled {background-color:rgba(254,192,0,0.5); color:#fff !important; border:none;}
+html, body {background-color:#F9F9FC;}
+.header {display:flex; align-items:start; justify-content: center; flex-wrap:wrap; width:80px; height:100%; padding-top:32px; position:fixed; top:0; left:0; background-color:#fff;}
+.header .utils {width:100%;  text-align:center;}
+.header .util {display:block; width:100%; margin-bottom:54px;}
+.header .util .wrap-img {content:""; width:20px; height:20px; margin:0 auto; margin-bottom:8px; position:relative;}
+.header .util .wrap-img img {position:absolute; top:50%; left:50%; transform:translate(-50% ,-50%);}
+.header .util .text {font-size:14px; font-weight:500; color:#8493FF;}
+.header .util img {display:inline-block;}
+.contents {min-height:500px; padding:40px; padding-left:140px;}
+.wrap-form {padding:64px 32px; background-color:#fff; border-radius:5px;}
+.wrap-form .btns {margin-top:48px; text-align:right;}
+.wrap-form .btns .btn {margin-left:16px;}
 
-#modules {}
-#modules:after {display:block; content:""; clear:both;}
-.module {width:15.8333%; margin-left:1%; margin-bottom:1%; float:left; background-color:#fff; box-shadow:0px 3px 6px rgba(0,0,0,0.16); cursor:pointer; border-radius:10px; overflow:hidden;}
-.module:nth-child(6n + 1) {margin-left:0;}
-.module .wrap-box-ratio {border-bottom:1px solid #e1e1e1;}
-.module-texts {padding:15px 20px;}
-.module-title {width:100%; white-space:nowrap; font-size:16px; font-weight:500; overflow:hidden; text-overflow:ellipsis;}
-.module-tags {display:block; margin-bottom:9px; height:48px; overflow:hidden;}
-.module-tag {display:inline-block; margin-right:5px; font-size:12px; font-weight:500;}
-.module-date {font-size:12px; font-weight:500; color:#CCCCCC; text-align:right;}
-
-@media screen and (max-width:1200px){
-    .module {width:32.66%;}
-    .module:nth-child(6n + 1) {margin-left:1%;}
-    .module:nth-child(3n + 1) {margin-left:0;}
-
-}
-
-@media screen and (max-width:750px){
-    .module {width:100%;}
-    .module {margin-bottom:20px;}
-    .module:nth-child(6n + 1) {margin-left:0%;}
-    .module:nth-child(3n + 1) {margin-left:0;}
-}
+#login .links {margin-bottom:36px;}
+#register .btn {margin-top:16px;}

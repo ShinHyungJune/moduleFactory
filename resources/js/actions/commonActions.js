@@ -55,8 +55,6 @@ export const logout = () => {
             });
 
             localStorage.removeItem("user");
-
-            window.location.replace("/login");
         });
     }
 };

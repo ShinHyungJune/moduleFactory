@@ -12,23 +12,17 @@ import Register from './pages/Register';
 import SendResetPassword from './pages/SendResetPassword';
 import ResetPassword from './pages/ResetPassword';
 import Flash from './components/common/Flash';
-import Modules from "./pages/Modules";
-
-import {setScrollActive} from "./actions/commonActions";
+import Modules from "./pages/modules/Items";
+import Projects from './pages/projects/Items';
+import ProjectCreate from './pages/projects/Create';
+import ProjectEdit from './pages/projects/Edit';
+import ModuleCreate from './pages/modules/Create';
+import ModuleEdit from './pages/modules/Edit';
 
 const Index = () => {
     const html = document.querySelector("html");
     
-    useEffect(() => {
-        window.addEventListener("scroll", onScroll);
-    }, []);
-    
-    const onScroll = (e) => {
-        if(html.getBoundingClientRect().top === 0)
-            return store.dispatch(setScrollActive(false));
-    
-        return store.dispatch(setScrollActive(true));
-    };
+
     
     return (
         <Provider store={store}>
@@ -38,10 +32,16 @@ const Index = () => {
                     
                     <Header />
                     
-                    <div className="wrap-contents">
+                    <div className="contents">
                         <Switch>
-                            <AuthRoute exact path="/" component={Modules} />
-                            <AuthRoute exact path="/modules" component={Modules} />
+                            <AuthRoute exact path="/" component={Projects} />
+                            <AuthRoute exact path="/projects" component={Projects} />
+                            <AuthRoute exact path="/projects/create" component={ProjectCreate} />
+                            <AuthRoute exact path="/projects/edit/:id" component={ProjectEdit} />
+                            
+                            <AuthRoute exact path="/projects/:project_id" component={Modules} />
+                            <AuthRoute exact path="/modules/create/:project_id" component={ModuleCreate} />
+                            <AuthRoute exact path="/modules/edit/:id" component={ModuleEdit} />
 
                             <Route exact path="/login" component={Login}/>
                             <Route exact path="/register" component={Register}/>
@@ -50,6 +50,7 @@ const Index = () => {
                             
                         </Switch>
                     </div>
+                    
                 </Fragment>
             </Router>
         </Provider>

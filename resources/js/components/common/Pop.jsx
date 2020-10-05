@@ -2,7 +2,8 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {setPop} from "../../actions/commonActions";
 import {connect} from 'react-redux';
 
-const Pop = ({type = "page", name = null, children, onClose = () => null, buttons = [], includeCancel = false, pop, setPop}) => {
+const Pop = ({type = null, name = null, children, onClose = () => null, buttons = [], includeCancel = false, pop, setPop}) => {
+    /*
     useEffect(() => {
         if(pop === name){
             history.pushState({page: "pop"}, document.title, location.pathname + `#${name}`);
@@ -15,6 +16,8 @@ const Pop = ({type = "page", name = null, children, onClose = () => null, button
         });
 
     }, [pop]);
+    */
+    
     const close = () => {
         onClose();
 
@@ -32,9 +35,9 @@ const Pop = ({type = "page", name = null, children, onClose = () => null, button
                         {name}
                     </p>
 
-                    <div className="pop-header-btn">
+                    {/* <div className="pop-header-btn">
                         <img src="/img/icon_thin_x.png" alt="" className="only-page" onClick={close}/>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className="pop-contents">
@@ -52,7 +55,7 @@ const Pop = ({type = "page", name = null, children, onClose = () => null, button
                 </div>
             </div>
 
-            <div className="black animated fadeIn"></div>
+            <div className="black"></div>
         </Fragment>
         );
 

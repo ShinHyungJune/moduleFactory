@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateModulesTable extends Migration
+class CreateProjectUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,14 @@ class CreateModulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('modules', function (Blueprint $table) {
-            $table->id();
+        Schema::create('project_user', function (Blueprint $table) {
             $table->unsignedBigInteger("user_id")->index();
             $table->foreign("user_id")->on("users")->references("id")->onDelete("cascade");
             $table->unsignedBigInteger("project_id")->index();
             $table->foreign("project_id")->on("projects")->references("id")->onDelete("cascade");
-            $table->string("title");
-            $table->text("body");
-            $table->text("html")->nullable();
-            $table->text("css")->nullable();
-            $table->text("js")->nullable();
+            $table->boolean("master")->default(false);
+            $table->index(["user_id", "project_id"]);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -36,6 +31,6 @@ class CreateModulesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('modules');
+        Schema::dropIfExists('project_user');
     }
 }

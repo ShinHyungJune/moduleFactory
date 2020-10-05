@@ -1,18 +1,21 @@
 import React, {Fragment, useState, useEffect} from 'react';
 
-const InputImage = ({form, setForm, el, mergeOnChange}) => {
+const InputAvatar = ({form, setForm, el, mergeOnChange}) => {
     let [url, setUrl] = useState(null);
     let [imgChanged, setImgChanged] = useState(false);
     let [fakeFile, setFakeFile] = useState({
         name: null,
         url: null
     });
-    
+
     useEffect(() => {
         if(form[el.props.name] && !imgChanged){ // 사용자가 파일 선택 눌러서 이미지 변경했으면, 업데이트라 해도 이미지는 새로 등록되야함.
             setFakeFile(form[el.props.name]);
             
             setUrl(form[el.props.name].url);
+            
+            if(form[el.props.name].url)
+                extendImg(form[el.props.name].url);
             
             setForm({
                 ...form,
@@ -28,16 +31,18 @@ const InputImage = ({form, setForm, el, mergeOnChange}) => {
             return ;
         
         let file = event.target.files[0];
-        
+
         let reader = new FileReader();
         
         let eventTargetName = event.target.name;
         
         reader.readAsDataURL(file);
-        
+
         reader.onload = e => {
             setUrl(e.target.result);
-            
+
+            extendImg(e.target.result);
+
             setForm({
                 ...form,
                 [eventTargetName]: file
@@ -45,10 +50,36 @@ const InputImage = ({form, setForm, el, mergeOnChange}) => {
         };
     };
     
+    const extendImg = (url) => {
+        let img = new Image();
+    
+        img.src = url;
+    
+        img.onload = () => {
+        
+            if(img.width > img.height)
+                $(`${el.props.className ? "." + el.props.className : ".input-avatar"} .ratioBox img`).css("width", "auto").css("height", "100%");
+        
+            if(img.width <= img.height)
+                $(`${el.props.className ? "." + el.props.className : ".input-avatar"} .ratioBox img`).css("width", "100%").css("height", "auto");
+        };
+    };
+    
     return (
-        <div className={el.props.className ? el.props.className + ` ${url ? "active" : ""}` :`input-${el.props.type ? el.props.type : el.type} ${url ? "active" : ""}`}>
+        <div className={el.props.className ? `${el.props.className} ${url ? "active" : ""}` :`input-${el.props.type ? el.props.type : el.type} ${url ? "active" : ""}`}>
             {/* button */}
-            <label className={"btn btn-text bg-primary"} htmlFor={el.props.name}>파일 선택</label>
+            <label className={`btn btn-text bg-primary`} htmlFor={el.props.name}>
+                파일 선택
+                {
+                    url ?
+                    <div className="ratioBox-wrap">
+                        <div className="ratioBox">
+                            <img src={url} alt=""/>
+                        </div>
+                    </div> : null
+                }
+
+            </label>
             
             {React.cloneElement(el, {
                 onChange: (event) => {el.props.onChange ? mergeOnChange(el, event) : changeForm(event); },
@@ -65,7 +96,7 @@ const InputImage = ({form, setForm, el, mergeOnChange}) => {
                             <div className="input-file-name">{fakeFile ? fakeFile.name : form[el.props.name].name}</div>
                             
                             {/* file img */}
-                            {url ? <img className="input-file-img" src={url} /> : null}
+                            {/*{url ? <img className="input-file-img" src={url} /> : null}*/}
                         </Fragment>
                     ) : null
             }
@@ -73,4 +104,4 @@ const InputImage = ({form, setForm, el, mergeOnChange}) => {
     );
 };
 
-export default InputImage;
+export default InputAvatar;

@@ -1,156 +1,185 @@
-import React, {useEffect, useState, Fragment} from 'react';
+import React, {useEffect, useState} from 'react';
 import {setFlash} from "../../actions/commonActions";
 import {connect} from "react-redux";
+import InputText from "./inputs/InputText";
+import InputCheckbox from './inputs/InputCheckbox';
+import InputSelect from './inputs/InputSelect';
+import InputTextarea from './inputs/InputTextarea';
+import InputFile from './inputs/InputFile';
+import InputImage from './inputs/InputImage';
+import InputCodeEditor from './inputs/InputCodeEditor';
+import InputTags from "./inputs/InputTags";
+import InputAvatar from "./inputs/InputAvatar";
+import InputRadio from "./inputs/InputRadio";
+import InputAddress from "./inputs/InputAddress";
 
-const Form = ({children, url = "", method = "", onThen = (response) => {}, onCatch = (error) => {}, defaultForm = null, setFlash}) => {
+const Form = ({children, url = "", method = "", onSubmit = () => {}, onThen = (response) => {}, onCatch = (error) => {}, defaultForm = null, setFlash, enterSubmitDisabled = false}) => {
     let [form, setForm] = useState({
         errors: {}
     });
-    
+
     let loading = false;
-    
+
     const submit = (e) => {
         e.preventDefault();
-        
+
+        onSubmit(form);
+
         if(loading)
             return;
-        
+
         loading = true;
-        
+
         let formData = new FormData();
-    
-        Object.entries(form).map(item => {
-            formData.append(item[0], item[1]);
+
+        // Object.entries(form).map(data => formData.append(data[0], data[1]));
+        
+        Object.entries(form).map(data => {
+            if(Array.isArray(data[1]))
+                return data[1].forEach(value => {
+                    formData.append(`${data[0]}[]`, value);
+                });
+        
+            return formData.append(data[0], data[1]);
         });
         
+        // getFormData(formData, form);
+
+        if(method === "patch" || method === "PATCH" || method === "put" || method === "PUT") {
+            method = "post"; // patch, put multipart form 쓰면 데이터가 안날아가 그래서 post로 날리고 _method를 설정해주는식으로 해야돼
+
+            formData.append("_method","patch");
+        }
+
         axios[method](url, formData).then(response => {
             onThen(response.data);
-            
+
             setFlash(response.data.message);
-            
+
+            setForm({errors: {}});
+
             loading = false;
         }).catch(error => {
+            console.log(error);
+
             onCatch(error.response.data);
-            
-            if(error.response.status === 422)
+    
+            if(error.response.status === 422) {
+                form.errors = error.response.data.errors;
+                
                 return setForm({
                     ...form,
                     errors: error.response.data.errors
                 });
+            }
+            
+
             
             setFlash(error.response.data.message);
-            
+
             loading = false;
         });
-        
+
     };
     
+    const getFormData = (formData, data, key) => {
+    
+        if ( ( typeof data === 'object' && data !== null ) || Array.isArray(data) ) {
+            for ( let i in data ) {
+                if ( ( typeof data[i] === 'object' && data[i] !== null ) || Array.isArray(data[i]) ) {
+                    if(!key)
+                        getFormData(formData, data[i],i);
+                    else
+                        getFormData(formData, data[i], key + '[' + i + ']');
+                } else {
+                    if(!key)
+                        formData.append(i, data[i]);
+                    else
+                        formData.append(key + '[' + i + ']', data[i]);
+                }
+            }
+        } else {
+            formData.append(key, data);
+        }
+    };
+
     const clearError = () => {
         setForm({
             ...form,
             errors: {}
         })
     };
-    
-    const changeForm = (event) => {
-        // 체크박스
-        if(event.target.type === "checkbox"){
-            form[event.target.name].includes(event.target.value)
-                ? form[event.target.name] = form[event.target.name].filter(data => data !== event.target.value)
-                : form[event.target.name].push(event.target.value);
-            
-            form[event.target.name].sort();
-            
-            return setForm({
-                ...form,
-                [event.target.name]: form[event.target.name]
-            });
-        }
-    
-        // 파일
-        if(event.target.type === "file"){
-            let file = event.target.files[0];
-            
-            // 이미지 파일이라면 썸네일 url 붙여주기
-            if(file.type.includes("image"))
-                file.thumbnail = URL.createObjectURL(file);
-            
-            return setForm({
-                ...form,
-                [event.target.name]: file
-            });
-        }
-        
-        setForm({
-            ...form,
-            [event.target.name] : event.target.value
-        });
-    };
-    
+
     useEffect(() => {
-        if(defaultForm){
+        if(defaultForm)
             setForm({
+                ...form,
                 ...defaultForm,
-                errors: {}
-            })
-        }
+                /*errors: form.errors ? form.errors : {}*/
+            });
     }, [defaultForm]);
     
-    const mergeOnChange = (el, event) => {
-        el.props.onChange(event);
-        
-        changeForm(event);
-    };
-    
-    return (
-        <form onSubmit={submit} onKeyDown={clearError}>
-            {
-                React.Children.map(children, el => {
-
-                    return el.type === "input" || el.type === "select" || el.type === "textarea"
-                        ?
-                        (
-                            <div className="input-wrap">
-                                {/* input label */}
-                                {el.props.title ? React.createElement('p', {className: "input-title"}, el.props.title) : null}
-                                
-                                <div className={el.props.className ? el.props.className :`input-${el.props.type ? el.props.type : el.type}`}>
-                                    {el.props.type === "file" ? <label htmlFor={el.props.name}>파일 선택</label> : null}
-                                    
-                                    {
-                                        el.props.type === "file"
-                                            ? (
-                                                form[el.props.name]
-                                                    ? (
-                                                        <Fragment>
-                                                            {/* file name */}
-                                                            <div className="input-file-name">{form[el.props.name].name}</div>
+    let contents = React.Children.map(children, el => {
+        return el.type === "input" || el.type === "select" || el.type === "textarea"
+            ?
+            (
+                <div className={`input-wrap`}>
+                    {/* label */}
+                    {el.props.title ? React.createElement('p', {className: "input-title"}, el.props.title) : null}
                     
-                                                            {/* file img */}
-                                                            {form[el.props.name].type.includes("image")
-                                                                ? <img className="input-file-img" src={form[el.props.name].thumbnail} />
-                                                                : null}
-                                                        </Fragment>
-                                                    ) : null
-                                            ) : null
-                                    }
-                                    
-                                    {React.cloneElement(el, {
-                                        onChange: (event) => {el.props.onChange ? mergeOnChange(el, event) : changeForm(event); },
-                                        value: form[el.props.name]
-                                            ? (el.props.type === "file") ? "" : form[el.props.name]
-                                            : "",
-                                        id: el.props.name
-                                    })}
-                                </div>
-                                
-                                {React.createElement('p', {className: "input-error"}, form.errors[el.props.name])}
-                            </div>
-                        ) : (el)
-                })
-            }
-        </form>
-    );
+                    {/* input text */}
+                    {el.type === "input" && (el.props.type === "text" || el.props.type === "password") ? <InputText form={form} setForm={setForm} el={el}/> : null}
+
+                    {/* textarea */}
+                    {el.type === "textarea" ? <InputTextarea form={form} setForm={setForm} el={el}/> : null}
+
+                    {/* input checkbox */}
+                    {el.type === "input" && el.props.type === "checkbox" ? <InputCheckbox form={form} setForm={setForm} el={el}/> : null}
+                
+                    {/* input radio */}
+                    {el.type === "input" && el.props.type === "radio" ? <InputRadio form={form} setForm={setForm} el={el}/> : null}
+                
+                    {/* input tags */}
+                    {el.type === "input" && el.props.type === "tags" ? <InputTags form={form} setForm={setForm} el={el}/> : null}
+                
+                    {/* input avatar */}
+                    {el.props.type === "avatar" ? <InputAvatar form={form} setForm={setForm} el={el}/> : null}
+                
+                    {/* input img */}
+                    {el.props.type === "img" ? <InputImage form={form} setForm={setForm} el={el}/> : null}
+                    
+                
+                    {/* input file */}
+                    {el.props.type === "file" ? <InputFile form={form} setForm={setForm} el={el}/> : null}
+
+                    {/* input address */}
+                    {el.props.type === "address" ? <InputAddress form={form} setForm={setForm} el={el}/> : null}
+                
+                    {/* select */}
+                    {el.type === "select" ? <InputSelect form={form} setForm={setForm} el={el}/> : null}
+                
+                    {/* codeEditor */}
+                    {el.props.type === "codeEditor" ? <InputCodeEditor defaultForm={defaultForm} form={form} setForm={setForm} el={el}/> : null}
+    
+                    {React.createElement('p', {className: "input-error"}, form.errors ? form.errors[el.props.name] : null)}
+                </div>
+            ) : el.props.type === "submit" ? React.cloneElement(el, {onClick: submit}) : (el)
+    });
+
+    /*const mergeOnChange = (el, event) => {
+        el.props.onChange(event);
+
+        changeForm(event);
+    };*/
+
+    return enterSubmitDisabled ?
+        (<div onSubmit={submit} onKeyDown={clearError}>
+            {contents}
+        </div>)
+        :
+        (<form onSubmit={submit} onKeyDown={clearError}>
+            {contents}
+        </form>);
 };
 
 const mapDIspatch = (dispatch) => {

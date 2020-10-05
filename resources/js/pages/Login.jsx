@@ -91,16 +91,17 @@ const Login = ({login, setFlash, user, location, history}) => {
                     </div>
                     
                     <div className="links align-right">
-                        <Link to="/sendResetPasswordMail" className="accent">비밀번호 찾기 / </Link>
-                        <Link to="/register" className="accent">회원가입</Link>
+                        <Link to="/sendResetPasswordMail" className="primary">비밀번호 찾기 / </Link>
+                        <Link to="/register" className="primary">회원가입</Link>
                     </div>
                     
-                    <button className="btn btn-middle btn-full bg-accent">로그인</button>
+                    <button className="btn type02 width-100">로그인</button>
                 </form>
             </div>
         </div>
     );
 };
+
 const mapState = (state) => {
     return {
         user: state.commonStates.user

@@ -110,7 +110,7 @@ const ResetPassword = ({user, setFlash, history}) => {
                         <p className="input-error">{form.errors && form.errors.password ? form.errors.password : ""}</p>
                     </div>
                     
-                    <button className="btn-middle btn-full bg-accent">
+                    <button className="btn type02 width-100">
                         {loading
                             ? <p className="animated flash infinite">진행중</p>
                             : "비밀번호 재설정"

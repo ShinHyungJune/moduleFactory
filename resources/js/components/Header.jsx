@@ -4,61 +4,56 @@ import {connect} from 'react-redux';
 import {setFlash, logout} from "../actions/commonActions";
 
 const Header = ({setFlash, logout, user, scrollActive}) => {
-
-    let [opened, setOpened] = useState(false);
-
-    let location = useLocation();
-
-    let hideUrlList = ["/login", "/sendResetPasswordMail", "/register", "/passwordReset"];
-
-    let [hide, setHide] = useState(hideUrlList.includes(location.pathname));
-
-    let toggleMenu = () => {
-        setOpened(!opened);
-    };
-
-    useEffect(() => {
-        setHide(hideUrlList.includes(location.pathname));
-    }, [location]);
-
+    
+    let links = [
+        {
+            title: "프로젝트",
+            to: "/projects",
+            icon: "/img/server--primary.png"
+        },
+        {
+            title: "모듈",
+            to: "/modules",
+            icon: "/img/box--primary.png"
+        },
+        {
+            title: "이미지",
+            to: "/images",
+            icon: "/img/image--primary.png"
+        }
+    ];
+    
     return (
-        <Fragment>
-            {hide ? null :
-                <header className={`bg-primary ${scrollActive ? "active" : ""}`}>
-                    <div className="header-top">
-                        <img src="/img/logo.png" alt="" className="logo"/>
+        <header className={`header`}>
+            <img src="/img/logo.png" alt="" className="logo"/>
             
-                        <button type="button" className="btn bg-white primary" onClick={logout}>LOGOUT</button>
-                    </div>
-                    <div className="header-bottom">
-                        <div className="navigations">
-                            <Link className="navigation active" to="/modules">
-                                <div className="wrap-img">
-                                    <img src="/img/icon_archive_white.png" alt=""/>
-                                </div>
-                    
-                                <span className="text">모듈 목록</span>
-                            </Link>
-                
-                            <Link className="navigation" to="/modules">
-                                <div className="wrap-img">
-                                    <img src="/img/icon_code_white.png" alt=""/>
-                                </div>
-                    
-                                <span className="text">전체 적용 CSS 설정</span>
-                            </Link>
+            <div className="utils">
+                {links.map((link, index) =>
+                    <Link className="util" to={link.to} key={index}>
+                        <div className="wrap-img">
+                            <img src={link.icon} alt=""/>
                         </div>
+                        
+                        <span className="text">{link.title}</span>
+                    </Link>
+                )}
+                
+                <button type="button" className="util bottom" onClick={logout}>
+                    <div className="wrap-img">
+                        <img src="/img/userMinus--primary.png" alt=""/>
                     </div>
-                </header>
-            }
-        </Fragment>
-
+                    
+                    <span className="text">로그아웃</span>
+                </button>
+            </div>
+        
+        </header>
+    
     );
 };
 const mapState = (state) => {
     return {
         user: state.commonStates.user,
-        scrollActive: state.commonStates.scrollActive
     }
 };
 
@@ -67,7 +62,7 @@ const mapDispatch = (dispatch) => {
         setFlash: (data) => {
             dispatch(setFlash(data));
         },
-
+        
         logout: (data) => {
             dispatch(logout(data));
         }

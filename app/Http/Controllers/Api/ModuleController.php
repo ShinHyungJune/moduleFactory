@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ModuleCollection;
 use App\Http\Resources\ModuleResource;
 use App\Module;
+use App\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +14,7 @@ class ModuleController extends ApiController
 {
     public function index(Request $request)
     {
-        $take = 20;
+        $take = 30;
 
         $modules = auth()->user()->modules()->latest()->paginate($take);
 
@@ -24,8 +25,17 @@ class ModuleController extends ApiController
     {
         $this->validator($request);
 
-        $module = DB::transaction(function() use($request) {
+        $project = Project::find($request->project_id);
+
+        if(!$project)
+            return $this->respondNotFound();
+
+        if(!$project->users->contains(auth()->id()))
+            return $this->respondForbidden();
+
+        $module = DB::transaction(function() use($request, $project) {
             $module = auth()->user()->modules()->create([
+                "project_id" => $request->project_id,
                 "title" => $request->title,
                 "body" => $request->body,
                 "html" => $request->html,
@@ -33,14 +43,23 @@ class ModuleController extends ApiController
                 "js" => $request->js
             ]);
 
-            $module->tags()->sync($request->tags);
+            $projectTags = $project->tags;
 
-            $module->addMedia($request->img)->toMediaCollection("images", "s3");
+            $tags = [];
+
+            foreach($request->tags as $tag) {
+                $projectTags->contains("name", $tag) ? $tags[] = $project->tags()->where("name", $tag)->first()->id : $tags[] = $project->tags()->create(["name" => $tag])->id;
+            }
+
+            $module->tags()->sync($tags);
+
+            if($request->img)
+                $module->addMedia($request->img)->toMediaCollection("images", "s3");
 
             return $module;
         });
 
-        return $this->respond(ModuleResource::make($module));
+        return $this->respondCreated(ModuleResource::make($module));
     }
 
     public function update(Request $request, $id)
@@ -52,11 +71,12 @@ class ModuleController extends ApiController
         if(!$module)
             return $this->respondNotFound();
 
-        if($module->user->id != auth()->id())
+        if(!$module->project->users->contains(auth()->id()))
             return $this->respondForbidden();
 
         $module = DB::transaction(function() use($request, $module) {
             $module->update([
+                "project_id" => $request->project_id,
                 "title" => $request->title,
                 "body" => $request->body,
                 "html" => $request->html,
@@ -76,14 +96,28 @@ class ModuleController extends ApiController
         return $this->respondUpdated(ModuleResource::make($module));
     }
 
-    public function delete(Request $request, $id)
+    public function show($id)
+    {
+        $item = Module::find($id);
+
+        if (!$item)
+            return $this->respondNotFound();
+
+        if (!$item->project->users->contains(auth()->id()))
+            return $this->respondForbidden();
+
+        return $this->respond(ModuleResource::make($item));
+    }
+
+
+    public function destroy(Request $request, $id)
     {
         $module = Module::find($id);
 
         if(!$module)
             return $this->respondNotFound();
 
-        if($module->user->id != auth()->id())
+        if(!$module->project->users->contains(auth()->id()))
             return $this->respondForbidden();
 
         $module->delete();
@@ -94,6 +128,7 @@ class ModuleController extends ApiController
     public function validator(Request $request)
     {
         return $request->validate([
+            "project_id" => "required|integer",
             "img" => "nullable|image",
             "title" => "required|string|max:500",
             "body" => "required|string|max:5000",
